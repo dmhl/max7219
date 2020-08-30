@@ -6,8 +6,8 @@
 
 # Features
 * asynchronous reset
-* support multiple connected MAX7219 modules [generic section]
-* adjust brightness of the display of each module separately [generic section]
+* support multiple connected MAX7219 modules
+* adjust brightness of the display of each module separately
 
 # How to use it?
 1. Copy `MAX7219.vhd` and `MAX7219_Pack.vhd` files to your project location.
