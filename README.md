@@ -4,6 +4,11 @@
 ![MAX7219 7-segment 8-digit LED driver for FPGA, two modules cascade connected](docs/max7219_cascade.jpg
 )
 
+# Features
+* asynchronous reset
+* support multiple connected MAX7219 modules [generic section]
+* adjust brightness of the display of each module separately [generic section]
+
 # How to use it?
 1. Copy `MAX7219.vhd` and `MAX7219_Pack.vhd` files to your project location.
 2. Import package `MAX7219_Pack`
