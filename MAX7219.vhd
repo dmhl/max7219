@@ -34,7 +34,7 @@ architecture rtl of MAX7219 is
     constant DataBits       : integer := ActiveDigits * MAX7219BitsPerDigit;
     constant CommandRegSize : integer := Devices * MAX7219CommandRegSize;
 
-    type DigitData_t is array (0 to ActiveDigits - 1) of std_logic_vector(7 downto 0);
+    type DigitData_t is array (0 to ActiveDigits - 1) of std_logic_vector(3 downto 0);
 
     type OperationState_t is (reset,
         init_on, init_mode, init_intensity, init_scan,
@@ -50,8 +50,7 @@ architecture rtl of MAX7219 is
 begin
     process (clk, reset_n)
         variable counter      : integer                                 := 0;
-        variable latch_vector : std_logic_vector(DataBits - 1 downto 0) := (others => '0');
-        variable digits       : DigitData_t                             := (others => x"00");
+        variable digits       : DigitData_t                             := (others => x"0");
         variable digit_index  : integer range 0 to 7                    := 7;
 
     begin
@@ -60,7 +59,6 @@ begin
             state        <= reset;
             load_out     <= '0';
             counter      := 0;
-            latch_vector := (others => '0');
             digit_index  := 7;
             for i in Devices downto 1 loop
                 command_reg(MAX7219CommandRegSize * i - 1 downto MAX7219CommandRegSize * (i - 1)) <= x"0c00";
@@ -114,9 +112,8 @@ begin
                         state        <= latch_data;
                     end if;
                 when latch_data =>
-                    latch_vector := data_vector;
                     for i in ActiveDigits downto 1 loop
-                        digits(i - 1) := hex2segment(latch_vector(4 * i - 1 downto 4 * i - 4));
+                        digits(i - 1) := data_vector(4 * i - 1 downto 4 * i - 4);
                     end loop;
 
                     digit_index := 7;
@@ -125,7 +122,7 @@ begin
                     if (driver_state = idle) then
                         for i in Devices downto 1 loop
                             command_reg(MAX7219CommandRegSize * i - 1 downto MAX7219CommandRegSize * (i - 1)) <=
-                            x"0" & std_logic_vector(to_unsigned(digit_index + 1, 4)) & digits(8 * i - (8 - digit_index));
+									 x"0" & std_logic_vector(to_unsigned(digit_index + 1, 4)) & hex2segment(digits(8 * i - (8 - digit_index)));
                         end loop;
                         driver_state <= start;
                         if digit_index = 0 then
