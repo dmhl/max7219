@@ -18,7 +18,7 @@ package MAX7219_Pack is
         port (
             clk         : in std_logic;
             reset_n     : in std_logic;
-            data_vector : in std_logic_vector((Devices * 8 * MAX7219BitsPerDigit) - 1 downto 0);
+            data_vector : in std_logic_vector;
             clk_out     : out std_logic;
             data_out    : out std_logic;
             load_out    : out std_logic

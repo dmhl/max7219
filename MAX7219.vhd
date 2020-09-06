@@ -1,7 +1,7 @@
 -- MAX7219 module driver. Based on a code published as
 -- "Driver for MAX7219 with 8 digit 7-segment display" by sjm 15 May 2017
 --
--- Modified by Dariusz Michalski, august 2020
+-- Modified by dmhl, august 2020 (https://github.com/dmhl)
 --
 -- Features:
 -- * asynchronous reset
@@ -43,23 +43,23 @@ architecture rtl of MAX7219 is
     signal state : OperationState_t := reset;
 
     type DriverState_t is (idle, start, clk_data, clk_high, clk_low, finished);
-    signal driver_state   : DriverState_t                                  := idle;
+    signal driver_state : DriverState_t                                   := idle;
 
-    signal command_reg        : std_logic_vector((CommandRegSize - 1) downto 0) := (others => '0');
+    signal command_reg  : std_logic_vector((CommandRegSize - 1) downto 0) := (others => '0');
 
 begin
     process (clk, reset_n)
-        variable counter      : integer                                 := 0;
-        variable digits       : DigitData_t                             := (others => x"0");
-        variable digit_index  : integer range 0 to 7                    := 7;
+        variable counter     : integer              := 0;
+        variable digits      : DigitData_t          := (others => x"0");
+        variable digit_index : integer range 0 to 7 := 7;
 
     begin
         if reset_n = '0' then
             driver_state <= idle;
             state        <= reset;
             load_out     <= '0';
-            counter      := 0;
-            digit_index  := 7;
+            counter     := 0;
+            digit_index := 7;
             for i in Devices downto 1 loop
                 command_reg(MAX7219CommandRegSize * i - 1 downto MAX7219CommandRegSize * (i - 1)) <= x"0c00";
             end loop;
@@ -122,7 +122,7 @@ begin
                     if (driver_state = idle) then
                         for i in Devices downto 1 loop
                             command_reg(MAX7219CommandRegSize * i - 1 downto MAX7219CommandRegSize * (i - 1)) <=
-									 x"0" & std_logic_vector(to_unsigned(digit_index + 1, 4)) & hex2segment(digits(8 * i - (8 - digit_index)));
+                            x"0" & std_logic_vector(to_unsigned(digit_index + 1, 4)) & hex2segment(digits(8 * i - (8 - digit_index)));
                         end loop;
                         driver_state <= start;
                         if digit_index = 0 then
